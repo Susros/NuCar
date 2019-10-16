@@ -3,3 +3,17 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+// Font Awesome
+@import 'fontawesome/v4-shims.scss';
+@import 'fontawesome/solid.scss';
+@import 'fontawesome/regular.scss';
+@import 'fontawesome/fontawesome.scss';
+@import 'fontawesome/brands.scss';
+
+body, html, #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
