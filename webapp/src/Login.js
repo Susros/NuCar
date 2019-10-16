@@ -21,9 +21,9 @@ class Login extends Component {
                 <div className="container">
                     <div className="row justify-content-center mt-4">
                         <div className="col-md-6">
-                            <div className="bg-white text-dark p-3 rounded text-center">
+                            <div className="bg-white text-dark p-3 rounded">
                                 <div className="form-group border-bottom">
-                                    <h4>Login</h4>
+                                    <h4 className="text-center">Login</h4>
                                 </div>
 
                                 <div className="form-group">
@@ -41,7 +41,11 @@ class Login extends Component {
                                             aria-label="Email" 
                                             aria-describedby="email-input-addon"
                                             placeholder="Email"
+                                            id="email-input"
+                                            required
                                         />
+
+                                        <div className="invalid-feedback"></div>
                                     </div>
                                 </div>
 
@@ -60,20 +64,24 @@ class Login extends Component {
                                             aria-label="Password" 
                                             aria-describedby="password-input-addon"
                                             placeholder="Password"
+                                            id="password-input"
+                                            required
                                         />
+
+                                        <div className="invalid-feedback"></div>
                                     </div>
                                 </div>
 
-                                <div className="form-group text-left">
+                                <div className="form-group">
                                     <input type="submit" value="Login" className="btn btn-primary w-50 btn-lg" id="login-btn" />
                                 </div>
 
-                                <div className="form-group text-left">
+                                <div className="form-group">
                                     <Link to="/">Forgot your password?</Link>
                                 </div>
 
-                                <div className="form-group text-left">
-                                    <Link to="/register">Not a member yet? Register for free.</Link>
+                                <div className="form-group">
+                                    Not a member yet? <Link to="/register">Sign up here.</Link>
                                 </div>
                             </div>
                         </div>
