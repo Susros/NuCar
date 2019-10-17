@@ -95,6 +95,11 @@ class CarForm extends Component {
                 </div>
 
                 <div className="form-group">
+                    <label for="location-input" className="font-weight-bolder">Location</label>
+                    <input type="text" name="location" className="form-control" id="location-input" placeholder="Car location" required />
+                </div>
+
+                <div className="form-group">
                     <label for="description-input" className="font-weight-bolder">Description</label>
                     <Editor
                         initialValue=""
