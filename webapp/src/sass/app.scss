@@ -1,0 +1,63 @@
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// Font Awesome
+@import 'fontawesome/v4-shims.scss';
+@import 'fontawesome/solid.scss';
+@import 'fontawesome/regular.scss';
+@import 'fontawesome/fontawesome.scss';
+@import 'fontawesome/brands.scss';
+
+body, html, #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+#dashboard-sidebar {
+    width: 200px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: theme-color("dark");
+}
+
+#dashboard-nav > .list-group-item.active {
+    background: #474d54;
+    color: theme-color("light");
+    border: none;
+}
+
+#dashboard-nav > .list-group-item {
+    background: transparent;
+    border: none;
+    color: theme-color("light");
+}
+
+#dashboard-profile-btn-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 200px;
+}
+
+#dashboard-profile-btn-container .dropdown-toggle:after {
+    display: none !important;
+}
+
+#dashboard-profile-btn-container .dropdown-toggle:hover {
+    background: #474d54;
+}
+
+#dashboard-content-container {
+    padding-left: 200px;
+}
