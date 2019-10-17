@@ -10,6 +10,7 @@ import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
 import Notifications from './dashboard/Notifications';
 import Messages from './dashboard/Messages';
 import Cars from './dashboard/Cars';
+import AddCar from './dashboard/AddCar';
 
 import v_logo_light from './img/v_logo_light.png';
 
@@ -105,6 +106,10 @@ class Dashboard extends Component {
 
                             <Route exact path="/dashboard/cars">
                                 <Cars />
+                            </Route>
+
+                            <Route exact path="/dashboard/cars/add">
+                                <AddCar />
                             </Route>
                         </Switch>
                     </div>
