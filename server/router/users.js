@@ -16,6 +16,7 @@ const usersController = require('../controllers/UsersController');
 router.post('/register', usersController.register);
 
 // User Login
+router.post('/login', usersController.login);
 
 // Add user ethereum wallet
 
