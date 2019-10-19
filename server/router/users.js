@@ -7,7 +7,9 @@
 const express = require('express');
 
 // Middleware
-const authMiddleware = require('./middleware/auth');
+const auth = require('./middleware/auth');
+const onlyOwner = require('./middleware/onlyOwner');
+const onlyBorrower = require('./middleware/onlyBorrower');
 
 // Get express router
 const router = express.Router();
@@ -22,7 +24,7 @@ router.post('/register', usersController.register);
 router.post('/login', usersController.login);
 
 // Check if logged in
-router.get('/login/check', authMiddleware, function(req, res) {
+router.get('/login/check', auth, function(req, res) {
     res.status(200).json(
         {
             data: {
@@ -31,5 +33,14 @@ router.get('/login/check', authMiddleware, function(req, res) {
         }
     );
 });
+
+// Get owner cars
+router.get('/cars', onlyOwner, usersController.getCars);
+
+// Get rentals
+router.get('/rentals', onlyBorrower, usersController.getRentals);
+
+// Get user information
+router.get('/', auth, usersController.getUser);
 
 module.exports = router;

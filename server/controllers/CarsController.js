@@ -149,6 +149,82 @@ var CarsController = module.exports = {
     },
 
     /**
+     * Return the car
+     * 
+     * @param {HTTPRequest}  req 
+     * @param {HTTPResponse} res 
+     */
+    returnCar: async function(req, res) {
+        
+        // Get token decoded
+        const token_decoded = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
+    
+        // Get rental id
+        const rentalId = req.params.id;
+
+        // Get rental
+        const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rental` WHERE `id` = ? AND `user_id` = ?', [rentalId, token_decoded.id]);
+
+        if (rentalQueryResults.length > 0) {
+            const rental = rentalQueryResults[0];
+
+            // Get car
+            const [carQueryResults, carQueryFields] = await DB.execute('SELECT * FROM `cars` WHERE `status` = ? AND `id` = ?', ['unavailable', rental.car_id]);
+
+            if (carQueryResults.length > 0) {
+
+                const car = carQueryResults[0];
+    
+                // Get owner details
+                const [ownerQueryResults, ownerQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [car.user_id]);
+                const owner = ownerQueryResults[0];
+    
+                // Get user detail
+                const [userQueryResult, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [token_decoded.id]);
+                const user = userQueryResult[0];
+    
+                // Add to blockchain
+                CarNet.init();
+                CarNet.returnCar(car.hash, owner.eth_account, user.eth_account)
+                    .then(async transactionResult => {
+                        
+                        // Update car status
+                        await DB.execute('UPDATE `cars` SET `status` = ? WHERE `id` = ?', ['available', car.id]);
+    
+                        // Add rental information
+                        await DB.execute('UPDATE `rental` SET `return_at` = ? WHERE `id` = ? AND `car_id` = ? AND `user_id` = ?', [moment().format('YYYY-MM-DD'), rentalId, car.id, user.id]);
+    
+                        console.log(transactionResult);
+    
+                        res.status(200).json(
+                            {
+                                data: transactionResult
+                            }
+                        )
+    
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            } else {
+                res.status(404).json(
+                    {
+                        message: "Car not found."
+                    }
+                );
+            }
+
+        } else {
+            res.status(404).json(
+                {
+                    message: "Rental not found."
+                }
+            );
+        }
+
+    },
+
+    /**
      * Get list of cars
      * 
      * @param {HTTPRequest}  req 

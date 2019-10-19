@@ -127,7 +127,7 @@ module.exports = {
 
         // Deploy contract
         let instance = await this.contracts.CarNet.deployed();
-        return await instance.rentCar(
+        return await instance.returnCar(
             web3.utils.fromAscii(carHash),
             ownerEthAccount,
             { 

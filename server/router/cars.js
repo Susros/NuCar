@@ -7,8 +7,8 @@
 const express = require('express');
 
 // Middleware
-const onlyOwnerMiddleware = require('./middleware/onlyOwner');
-const onlyBorrowerMiddleware = require('./middleware/onlyBorrower');
+const onlyOwner = require('./middleware/onlyOwner');
+const onlyBorrower = require('./middleware/onlyBorrower');
 
 // Get express router
 const router = express.Router();
@@ -17,21 +17,19 @@ const router = express.Router();
 const carsController = require('../controllers/CarsController');
 
 // Add Car
-router.post('/add', onlyOwnerMiddleware, carsController.addCar);
+router.post('/add', onlyOwner, carsController.addCar);
 
 // Rent Car
-router.post('/:id/book', onlyBorrowerMiddleware, carsController.rentCar);
+router.post('/:id/book', onlyBorrower, carsController.rentCar);
 
 // Return Car
+router.post('/rental/:id/return', onlyBorrower, carsController.returnCar);
 
 // Get cars list
 router.get('/', carsController.getCarsList);
 
 // Get individual car
 router.get('/:id', carsController.getCar)
-
-// Get my cars list
-
 
 
 module.exports = router;
