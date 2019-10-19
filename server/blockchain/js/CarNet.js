@@ -81,7 +81,7 @@ module.exports = {
      * 
      * @return Contract transaction.
      */
-    rentCar: function(carHash, ownerEthAccount, ethAccount, privateKey) {
+    rentCar: async function(carHash, ownerEthAccount, ethAccount, privateKey) {
 
         // Deploy contract
         let instance = await this.contracts.CarNet.deployed();
@@ -108,10 +108,29 @@ module.exports = {
      * @param {string} ownerEthAccount  Ethereum address of car owner
      * @param {string} ethAccount       Ethereum address of car borrower
      */
-    returnCar: function(carHash, ownerEthAccount, ethAccount) {
+    returnCar: async function(carHash, ownerEthAccount, ethAccount) {
 
         // Deploy contract
         let instance = await this.contracts.CarNet.deployed();
         return await instance.rentCar(carHash, ownerEthAccount, { from: ethAccount, gas: 300000 });
+    },
+
+    /**
+     * Verify the account
+     * 
+     * @param {string} ethAccount Ethereum address of user
+     * @param {string} privateKey Private key to the account
+     * 
+     * @return True if correct, false otherwise
+     */
+    verifyAccount: function(ethAccount, privateKey) {
+
+        const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+        if (account.address == ethAccount) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 }

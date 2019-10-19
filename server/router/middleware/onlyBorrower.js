@@ -5,6 +5,7 @@
  */
 
 const jwt = require('jsonwebtoken');
+const mysql = require('mysql2');
 
 module.exports = function(req, res, next) {
 
@@ -22,19 +23,22 @@ module.exports = function(req, res, next) {
             } else {
 
                 // Check if token exit in database
-                DB.execute('SELECT * FROM `users` WHERE `token` = ?', [token], (err, results, fields) => {
-                    if (results.length == 0) {
-                        res.status(401).json({ message: 'Unauthorized access.' });
-                    } else {
-                        const user = results[0];
-
-                        if (user.type == 'borrower') {
-                            next();
-                        } else {
+                DB.execute(
+                    mysql.format('SELECT * FROM `users` WHERE `token` = ?', [token]), 
+                    (err, results, fields) => {
+                        if (results.length == 0) {
                             res.status(401).json({ message: 'Unauthorized access.' });
+                        } else {
+                            const user = results[0];
+
+                            if (user.type == 'borrower') {
+                                next();
+                            } else {
+                                res.status(401).json({ message: 'Unauthorized access.' });
+                            }
                         }
                     }
-                });
+                );
             }
         })
 

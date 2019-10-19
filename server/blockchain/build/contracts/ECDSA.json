@@ -2342,9 +2342,16 @@
     "name": "solc",
     "version": "0.5.8+commit.23d335f2.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0xC47229556b78dd5F782BfD74a2ac94eA0259F25F",
+      "transactionHash": "0x6ec0faed664c132b0725ef6bb4f1eabf98d3993cce521828a75b6800b4ed68de"
+    }
+  },
   "schemaVersion": "3.0.16",
-  "updatedAt": "2019-10-17T12:44:41.392Z",
+  "updatedAt": "2019-10-18T23:53:41.157Z",
   "devdoc": {
     "details": "Elliptic Curve Digital Signature Algorithm (ECDSA) operations. * These functions can be used to verify that a message was signed by the holder of the private keys of a given address.",
     "methods": {}

@@ -5886,9 +5886,16 @@
     "name": "solc",
     "version": "0.5.8+commit.23d335f2.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0x53683d0f4400Bf0d55b296DE2Fad020c1a768596",
+      "transactionHash": "0x7f8b644a276f5fd87a7ddc2ade1f3a9bd757c734a0bf6c7258c63f00c47ad28f"
+    }
+  },
   "schemaVersion": "3.0.16",
-  "updatedAt": "2019-10-17T12:44:41.389Z",
+  "updatedAt": "2019-10-18T23:53:41.444Z",
   "devdoc": {
     "author": "Kelvin Yin",
     "details": "Each car will have unique hash which is then map to         the address of the owner/borrower.",

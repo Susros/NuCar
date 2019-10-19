@@ -5,11 +5,15 @@
  */
 
 const jwt = require('jsonwebtoken');
+const mysql = require('mysql2');
 
 module.exports = function(req, res, next) {
 
     // Get token from cookie
-    const token = req.cookies.lg_token;
+    const token = req.body.lg_token
+    || req.query.lg_token
+    || req.headers['x-access-token']
+    || req.cookies.lg_token;
 
     if (!token) {
         res.status(401).json({ message: 'Token is not provided.' });
@@ -20,15 +24,19 @@ module.exports = function(req, res, next) {
             if (err) {
                 res.status(401).json({ message: 'Unauthorized access.' });
             } else {
-
                 // Check if token exit in database
-                DB.execute('SELECT * FROM `users` WHERE `token` = ?', [token], (err, results, fields) => {
-                    if (results.length == 0) {
-                        res.status(401).json({ message: 'Unauthorized access.' });
-                    } else {
-                        next();
+                DB.execute(
+                    mysql.format('SELECT * FROM `users` WHERE `token` = ?', [token]), 
+                    (err, results, fields) => {
+                        if (err) throw err;
+
+                        if (results.length == 0) {
+                            res.status(401).json({ message: 'Unauthorized access.' });
+                        } else {
+                            next();
+                        }
                     }
-                });
+                );
             }
         })
 

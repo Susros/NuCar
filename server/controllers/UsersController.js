@@ -1,5 +1,5 @@
 /**
- * Controller for users model
+ * Controller for users routes
  * 
  * @author Kelvin Yin
  */
@@ -8,6 +8,7 @@ const passwordHash = require('password-hash');
 const jwt          = require('jsonwebtoken');
 const mysql        = require('mysql2');
 const moment       = require('moment');
+const CarNet       = require('../blockchain/js/CarNet');
 
 var UserController = module.exports = {
 
@@ -37,11 +38,26 @@ var UserController = module.exports = {
         const confirmPassword = req.body.confirm_password;
         const userType        = req.body.user_type;
 
+        let ethAccount = req.body.ethereum_address;
+        let privateKey = req.body.private_key;
+
+        // Make sure there is '0x' at the front
+        if (ethAccount.substring(0, 2) != '0x') {
+            ethAccount = '0x' + ethAccount;
+        }
+
+        if (privateKey.substring(0, 2) != '0x') {
+            privateKey = '0x' + privateKey;
+        }
+
+        // For connecting to ethereum account
+        CarNet.init();
+
         // To store errors
         var errors = [];
 
         // Get users with email.
-        const [users, fields] = await DB.execute('SELECT * FROM `users` WHERE `email` = ?', [email]);
+        const [users, fields] = await DB.execute('SELECT * FROM `users` WHERE `email` = ? OR `eth_account` = ?', [email, ethAccount]);
 
         // Check if user already exists
         if (users.length > 0) {
@@ -95,6 +111,16 @@ var UserController = module.exports = {
                     }
                 );
             }
+
+            // Verify ethereum account
+            if (CarNet.verifyAccount(ethAccount, privateKey) === false) {
+                errors.push(
+                    {
+                        message: "Could not connect to Ethereum account.",
+                        field: "ethereum_address"
+                    }
+                )
+            }
         }
 
         // Check if validations are all passed
@@ -119,8 +145,8 @@ var UserController = module.exports = {
                         password        : passwordHash.generate(password),
                         type            : userType,
                         img             : '',
-                        eth_account     : '',
-                        eth_private_key : '',
+                        eth_account     : ethAccount,
+                        eth_private_key : privateKey,
                         token           : '',
                         created_at      : moment().format('YYYY-MM-DD')
                     }
@@ -191,7 +217,8 @@ var UserController = module.exports = {
             const token = jwt.sign(
                 {
                     id : user.id.toString(),
-                    email : user.email
+                    email : user.email,
+                    eth_account : user.eth_account
                 },
                 process.env.JWT_SECRET_KEY,
                 {
@@ -209,20 +236,12 @@ var UserController = module.exports = {
                 {
                     data: {
                         id : user.id.toString(),
-                        email: user.email
+                        email: user.email,
+                        eth_account: user.eth_account
                     }
                 }
             );
 
         }
-        
-
-    },
-
-    connectEthereumWallet: function(req, res) {
-
-        // 
-
     }
-
 }
