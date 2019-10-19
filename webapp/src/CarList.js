@@ -31,7 +31,7 @@ class CarList extends Component {
 
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-4 border-right bg-light">
+                        <div className="col-3 border-right bg-light">
                             <div className="p-3">
                                 <h3 className="mb-4">Filter</h3>
 
@@ -48,15 +48,31 @@ class CarList extends Component {
                                         </div>
                                     </div>
 
-                                    <div className="form-row">
-                                        <div className="col-6">
-                                            <input type="date" name="pickup_date" className="form-control" id="pickup-date-input" />
-                                        </div>
+                                    <div className="form-group">
+                                        <label for="pickup-date-input">Pickup Date</label>
 
-                                        <div className="col-6">
-                                            <div className="form-group">
-                                                <input type="date" name="return_date" className="form-control" id="return-date-input" />
+                                        <div className="input-group">
+                                            <div className="input-group-prepend">
+                                                <span className="input-group-text bg-white border-right-0">
+                                                    <i className="fas fa-calendar-alt"></i>
+                                                </span>
                                             </div>
+
+                                            <input type="date" name="pickup_date" className="form-control border-left-0" id="pickup-date-input" />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label for="return-date-input">Return Date</label>
+
+                                        <div className="input-group">
+                                            <div className="input-group-prepend">
+                                                <span className="input-group-text bg-white border-right-0">
+                                                    <i className="fas fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                            
+                                            <input type="date" name="return_date" className="form-control border-left-0" id="return-date-input" />
                                         </div>
                                     </div>
 
@@ -163,7 +179,7 @@ class CarList extends Component {
                                                 <div className="form-group">
                                                     <div className="custom-control custom-checkbox">
                                                         <input type="checkbox" className="custom-control-input" id="feature-aircon-input" />
-                                                        <label className="custom-control-label" for="feature-aircon-input">Air Conditioning</label>
+                                                        <label className="custom-control-label" for="feature-aircon-input">Air Con</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -240,7 +256,7 @@ class CarList extends Component {
                             </div>
                         </div>
 
-                        <div className="col-8">
+                        <div className="col-9">
                             <div className="py-3 border-bottom">
                                 <small>
                                     Showing <b>20</b> cars near Newcastle.
