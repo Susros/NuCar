@@ -17,13 +17,18 @@ const router = express.Router();
 const carsController = require('../controllers/CarsController');
 
 // Add Car
-router.post('/add', carsController.addCar);
+router.post('/add', onlyOwnerMiddleware, carsController.addCar);
 
 // Rent Car
+router.post('/:id/book', onlyBorrowerMiddleware, carsController.rentCar);
 
 // Return Car
 
 // Get cars list
+router.get('/', carsController.getCarsList);
+
+// Get individual car
+router.get('/:id', carsController.getCar)
 
 // Get my cars list
 

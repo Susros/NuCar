@@ -5890,12 +5890,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x53683d0f4400Bf0d55b296DE2Fad020c1a768596",
-      "transactionHash": "0x7f8b644a276f5fd87a7ddc2ade1f3a9bd757c734a0bf6c7258c63f00c47ad28f"
+      "address": "0x03bF5dED23fCf993076816ed3C0881aa287c4987",
+      "transactionHash": "0x431ac6999341d29e335474c38c65d798766c94cbbc2e368ddf313df98d5924de"
     }
   },
   "schemaVersion": "3.0.16",
-  "updatedAt": "2019-10-18T23:53:41.444Z",
+  "updatedAt": "2019-10-19T03:26:07.418Z",
   "devdoc": {
     "author": "Kelvin Yin",
     "details": "Each car will have unique hash which is then map to         the address of the owner/borrower.",

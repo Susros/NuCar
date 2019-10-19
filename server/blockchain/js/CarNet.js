@@ -67,7 +67,14 @@ module.exports = {
         // Get the signature
         const signature = signedHash.signature;
 
-        return await instance.addCar(carHash, signature, { from: ethAccount, gas: 3000000 });
+        return await instance.addCar(
+            web3.utils.fromAscii(carHash),
+            signature, 
+            { 
+                from: ethAccount,
+                gas: 3000000 
+            }
+        );
 
     },
 
@@ -98,7 +105,15 @@ module.exports = {
         // Get the signature
         const signature = signedHash.signature;
 
-        return await instance.rentCar(carHash, ownerEthAccount, signature, { from: ethAccount, gas: 300000 });
+        return await instance.rentCar(
+            web3.utils.fromAscii(carHash),
+            ownerEthAccount,
+            signature,
+            {
+                from: ethAccount,
+                gas: 300000 
+            }
+        );
     },
 
     /**
@@ -112,7 +127,14 @@ module.exports = {
 
         // Deploy contract
         let instance = await this.contracts.CarNet.deployed();
-        return await instance.rentCar(carHash, ownerEthAccount, { from: ethAccount, gas: 300000 });
+        return await instance.rentCar(
+            web3.utils.fromAscii(carHash),
+            ownerEthAccount,
+            { 
+                from: ethAccount,
+                gas: 300000 
+            }
+        );
     },
 
     /**
