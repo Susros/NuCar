@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import axios from 'axios';
 
 import SimpleNavBar from './components/navbar/SimpleNavbar';
@@ -22,28 +22,61 @@ class Register extends Component {
         super(props);
 
         this.state = {
-            first_name            : '',
-            last_name             : '',
-            email                 : '',
-            password              : '',
-            confirm_password      : '',
-            ethereum_address      : '',
-            ethereum_private_key  : '',
-            user_type             : ''
+            inputs: {
+                first_name            : '',
+                last_name             : '',
+                email                 : '',
+                password              : '',
+                confirm_password      : '',
+                ethereum_address      : '',
+                ethereum_private_key  : '',
+                user_type             : ''
+            },
+
+            isloggedin: false,
+            isloading: true
         }
     }
 
+    /**
+     * After component is mounted
+     */
+    componentDidMount() {
+        axios.get(
+            process.env.REACT_APP_API_URL + '/users/login/check', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                withCredentials: true
+            }
+        ).then(res => {
+            this.setState({ isloggedin: true, isloading: false });
+        }).catch(err => {
+            this.setState({ isloggedin: false, isloading: false });
+        });
+    }
+
+    /**
+     * Update inputs state when filling up the input fields
+     * 
+     * @param {Object} event Input field event
+     */
     handleInputChange = event => {
         const { value, name } = event.target;
 
-        // Set state values
-        this.setState(
-            {
-                [name]: value
-            }
-        );
+        const{ inputs } = { ...this.state };
+
+        inputs[name] = value;
+
+        this.setState({ inputs })
     }
 
+    /**
+     * Handle form submit
+     * 
+     * @param {Object} event Form event
+     */
     onSubmit = event => {
         event.preventDefault();
 
@@ -53,10 +86,18 @@ class Register extends Component {
 
         axios.post(
             process.env.REACT_APP_API_URL + '/users/register',
-            this.state
+            this.state.inputs,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                
+                withCredentials: true
+            }
         ).then(res => {
-            console.log(res);
             this.props.history.push('/dashboard');
+            this.setState({ isloggedin: true });
         }).catch(err => {
             btn.removeAttribute("disabled");
             btn.nextElementSibling.classList.add('d-none');
@@ -75,6 +116,15 @@ class Register extends Component {
     }
 
     render() {
+
+        if (this.state.isloading) {
+            return null;
+        }
+
+        if (this.state.isloggedin) {
+            return <Redirect to="/dashboard" />
+        }
+
         return(
             <DarkContainer>
                 <div className="py-3">

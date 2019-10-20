@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 import SimpleNavBar from './components/navbar/SimpleNavbar';
 import DarkContainer from './containers/DarkContainer';
@@ -22,22 +22,55 @@ class Login extends Component {
         super(props);
 
         this.state = {
-            email    : '',
-            password : ''
+            inputs: {
+                email    : '',
+                password : ''
+            },
+
+            isloggedin: false,
+            isloading: true
         }
     }
 
+    /**
+     * After component is mounted
+     */
+    componentDidMount() {
+        axios.get(
+            process.env.REACT_APP_API_URL + '/users/login/check', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                withCredentials: true
+            }
+        ).then(res => {
+            this.setState({ isloggedin: true, isloading: false });
+        }).catch(err => {
+            this.setState({ isloggedin: false, isloading: false });
+        });
+    }
+
+    /**
+     * Update inputs state when filling up the input fields
+     * 
+     * @param {Object} event Input field event
+     */
     handleInputChange = event => {
         const { value, name } = event.target;
 
-        // Set state values
-        this.setState(
-            {
-                [name]: value
-            }
-        );
+        const{ inputs } = { ...this.state };
+
+        inputs[name] = value;
+
+        this.setState({ inputs })
     }
 
+    /**
+     * Handle form submit
+     * 
+     * @param {Object} event Form event
+     */
     onSubmit = event => {
         event.preventDefault();
 
@@ -47,9 +80,16 @@ class Login extends Component {
 
         axios.post(
             process.env.REACT_APP_API_URL + '/users/login',
-            this.state
+            this.state.inputs,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                withCredentials: true
+            }
         ).then(res => {
-            console.log(res);
             this.props.history.push('/dashboard');
         }).catch(err => {
             btn.removeAttribute("disabled");
@@ -69,6 +109,15 @@ class Login extends Component {
     }
 
     render() {
+
+        if (this.state.isloading) {
+            return null;
+        }
+
+        if (this.state.isloggedin) {
+            return <Redirect to="/dashboard" />
+        }
+
         return(
             <DarkContainer>
                 <div className="py-3">

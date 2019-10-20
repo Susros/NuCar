@@ -6,6 +6,11 @@
 
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
+import temporary_car_image from '../img/temporary_car_image.jpg';
+
+import CarDetailsRow from './templates/CarDetailsRow';
 
 class Cars extends Component {
 
@@ -16,18 +21,50 @@ class Cars extends Component {
      */
     constructor(props) {
         super(props);
+
+        this.state = {
+            cars: [],
+            isloading: true
+        }
     }
 
+    /**
+     * After componen is mounted
+     * 
+     * Get all cars 
+     */
     componentDidMount() {
+        
         // Remove all active in the dashboard nav
         Array.from(document.getElementsByClassName("dashboard-nav-item")).forEach(el => {
             el.classList.remove("active");
         });
 
         document.getElementById("dashboard-nav-cars").classList.add("active");
+
+        // Get list of cars
+        axios.get(
+            process.env.REACT_APP_API_URL + '/users/cars', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                withCredentials: true
+            }
+        ).then(({ data }) => {
+            this.setState({ cars: data.data, isloading: false });
+        }).catch(err => {
+            this.setState({ isloading: false });
+        });
     }
 
     render() {
+
+        if (this.state.isloading) {
+            return null;
+        }
+
         return(
             <div>
                 <nav className="navbar navbar-light bg-light border-bottom">
@@ -78,119 +115,23 @@ class Cars extends Component {
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td className="align-middle" scope="row">1</td>
-                                    <td className="align-middle">
-                                        <img 
-                                            src="https://cnd2.imgix.net/members/vehicles/photos/000/018/706/original/SUM50V.jpg?ixlib=rails-3.0.2&w=2618"
-                                            width="100"
-                                            alt=""
-                                            title=""
+
+                                { 
+                                    this.state.cars.map( (car, num) => 
+                                        <CarDetailsRow 
+                                            num={ num }
+                                            title={ car.make + " " + car.model }
+                                            price={ car.price }
+                                            status={ car.status }
+                                            transmission={ car.transmission }
+                                            img={ temporary_car_image }
+                                            id={ car.id }
+                                            numSeat={ car.num_seat }
                                         />
-                                    </td>
+                                    )
+                                
+                                }
 
-                                    <td className="align-middle">
-                                        <ul className="list-unstyled">
-                                            <li><h6 className="font-weight-bolder">Toyota Corolla (2008)</h6></li>
-                                            <li>Transmission: Automatic</li>
-                                            <li>Number of Seat: 5</li>
-                                        </ul>
-                                    </td>
-
-                                    <td className="align-middle">
-                                        $10 / hr
-                                    </td>
-
-                                    <td className="align-middle">
-                                        <span className="badge badge-success">Available</span>
-                                    </td>
-
-                                    <td className="align-middle text-right">
-                                        <Link to="/" className="btn btn-primary btn-sm mr-2">
-                                            <i className="fas fa-eye small mr-1"></i> View
-                                        </Link>
-
-                                        <Link to="/" className="btn btn-success btn-sm">
-                                            <i className="fas fa-pen small mr-1"></i> Edit
-                                        </Link>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td className="align-middle" scope="row">1</td>
-                                    <td className="align-middle">
-                                        <img 
-                                            src="https://cnd2.imgix.net/members/vehicles/photos/000/018/706/original/SUM50V.jpg?ixlib=rails-3.0.2&w=2618"
-                                            width="100"
-                                            alt=""
-                                            title=""
-                                        />
-                                    </td>
-
-                                    <td className="align-middle">
-                                        <ul className="list-unstyled">
-                                            <li><h6 className="font-weight-bolder">Toyota Corolla (2008)</h6></li>
-                                            <li>Transmission: Automatic</li>
-                                            <li>Number of Seat: 5</li>
-                                        </ul>
-                                    </td>
-
-                                    <td className="align-middle">
-                                        $10 / hr
-                                    </td>
-
-                                    <td className="align-middle">
-                                        <span className="badge badge-success">Available</span>
-                                    </td>
-
-                                    <td className="align-middle text-right">
-                                        <Link to="/" className="btn btn-primary btn-sm mr-2">
-                                            <i className="fas fa-eye small mr-1"></i> View
-                                        </Link>
-
-                                        <Link to="/" className="btn btn-success btn-sm">
-                                            <i className="fas fa-pen small mr-1"></i> Edit
-                                        </Link>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td className="align-middle" scope="row">1</td>
-                                    <td className="align-middle">
-                                        <img 
-                                            src="https://cnd2.imgix.net/members/vehicles/photos/000/018/706/original/SUM50V.jpg?ixlib=rails-3.0.2&w=2618"
-                                            width="100"
-                                            alt=""
-                                            title=""
-                                        />
-                                    </td>
-
-                                    <td className="align-middle">
-                                        <ul className="list-unstyled">
-                                            <li><h6 className="font-weight-bolder">Toyota Corolla (2008)</h6></li>
-                                            <li>Transmission: Automatic</li>
-                                            <li>Number of Seat: 5</li>
-                                        </ul>
-                                    </td>
-
-                                    <td className="align-middle">
-                                        $10 / hr
-                                    </td>
-
-                                    <td className="align-middle">
-                                        <span className="badge badge-danger">Rented</span>
-                                    </td>
-
-                                    <td className="align-middle text-right">
-                                        <Link to="/" className="btn btn-primary btn-sm mr-2">
-                                            <i className="fas fa-eye small mr-1"></i> View
-                                        </Link>
-
-                                        <Link to="/" className="btn btn-success btn-sm">
-                                            <i className="fas fa-pen small mr-1"></i> Edit
-                                        </Link>
-                                    </td>
-                                </tr>
                             </tbody>
                         </table>
 
