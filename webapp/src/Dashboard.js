@@ -81,14 +81,14 @@ class Dashboard extends Component {
                                     <span>
                                         <i className="fas fa-bell mr-1"></i> Notifications
                                     </span>
-                                    <span class="badge badge-primary badge-pill">0</span>
+                                    <span className="badge badge-primary badge-pill">0</span>
                                 </Link>
 
                                 <Link to="/dashboard/messages" className="dashboard-nav-item  list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="dashboard-nav-messages">
                                     <span>
                                         <i className="fas fa-envelope mr-1"></i> Messages
                                     </span>
-                                    <span class="badge badge-primary badge-pill">0</span>
+                                    <span className="badge badge-primary badge-pill">0</span>
                                 </Link>
                                 {
                                     (this.state.user.type == 'owner') ?
@@ -105,10 +105,10 @@ class Dashboard extends Component {
 
                         <div id="dashboard-profile-btn-container">
                             <div className="border-top border-secondary">
-                                <div class="dropright">
+                                <div className="dropright">
                                     <div className="dropdown-toggle cursor-pointer px-3 py-2" id="dashboard-profile-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <div class="row align-items-center">
-                                            <div class="col-10">
+                                        <div className="row align-items-center">
+                                            <div className="col-10">
                                                 <img 
                                                     src={ profile_img }
                                                     width="32"
@@ -119,15 +119,15 @@ class Dashboard extends Component {
 
                                                 <span className="ml-2 text-light">{ this.state.user.first_name + " " + this.state.user.last_name }</span>
                                             </div>
-                                            <div class="col-2">
-                                                <div class="text-right text-secondary small">
+                                            <div className="col-2">
+                                                <div className="text-right text-secondary small">
                                                     <i className="fas fa-ellipsis-v"></i>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="dropdown-menu" aria-labelledby="dashboard-profile-dropdown">
+                                    <div className="dropdown-menu" aria-labelledby="dashboard-profile-dropdown">
                                         <a href="/" className="dropdown-item">Settings</a>
                                         <a href="/" className="dropdown-item">Logout</a>
                                     </div>

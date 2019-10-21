@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import axios from 'axios';
 
 import temporary_car_image from '../img/temporary_car_image.jpg';
@@ -46,6 +46,37 @@ function CarDetailsRow(props) {
                 <Link to="/" className="btn btn-primary btn-sm mr-2">
                     <i className="fas fa-eye small mr-1"></i> View
                 </Link>
+
+                <a href="#" className="btn btn-success btn-sm" data-toggle="modal" data-target={ "#car-view-modal-" + props.id }>
+                    <i className="fas fa-undo"></i> Return
+                </a>
+
+                <div className="modal fade" id={ "car-view-modal-" + props.id } tabindex="-1" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">{ props.title }</h5>
+                            </div>
+
+                            <div className="modal-body text-left">
+                                
+                                <p>
+                                    Confirming to return the car.
+                                </p>
+
+                                <form onSubmit={ props.handleReturn }>
+                                    <input type="hidden" name="rental_id" value={ props.rental_id } />
+
+                                    <div className="form-group">
+                                        <button type="button" className="btn btn-secondary mr-2" data-dismiss="modal">Close</button>
+                                        <input type="submit" value="Return" className="btn btn-success" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </td>
         </tr>
     );
@@ -96,6 +127,37 @@ class Rentals extends Component {
         }).catch(err => {
             this.setState({ isloading: false });
         });
+    }
+
+    /**
+     * Handle return car
+     * 
+     * @param {Object} event
+     */
+    returnCar = event => {
+        event.preventDefault();
+        
+        const id = parseInt(event.target.rental_id.value);
+
+        // Return car
+        axios.post(
+            process.env.REACT_APP_API_URL + '/cars/rental/' + id + '/return',
+            {
+                rental_id : id
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                withCredentials: true
+            }
+        ).then(res => {
+            window.location.href="/dashboard/rentals";
+        }).catch(err => {
+            console.log(err);
+        });
+
     }
 
     render() {
@@ -157,6 +219,7 @@ class Rentals extends Component {
                                 { 
                                     this.state.cars.map( (car, num) => 
                                         <CarDetailsRow 
+                                            key={ car.id }
                                             num={ num + 1 }
                                             title={ car.make + " " + car.model }
                                             price={ car.price }
@@ -165,6 +228,8 @@ class Rentals extends Component {
                                             img={ temporary_car_image }
                                             id={ car.id }
                                             numSeat={ car.num_seat }
+                                            rental_id={ car.rental_id }
+                                            handleReturn= { this.returnCar }
                                         />
                                     )
                                 
@@ -189,4 +254,4 @@ class Rentals extends Component {
     }
 }
 
-export default Rentals;
+export default withRouter(Rentals);
