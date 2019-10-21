@@ -199,6 +199,10 @@ class Login extends Component {
                                     </div>
                                 </form>
                             </div>
+
+                            <div className="mt-3 text-muted text-center">
+                                <small>Copyright &copy; 2019 NuCar &bull; Developed by Kelvin Yin</small>
+                            </div>
                         </div>
                     </div>
                 </div>
