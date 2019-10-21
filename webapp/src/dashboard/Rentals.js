@@ -10,9 +10,48 @@ import axios from 'axios';
 
 import temporary_car_image from '../img/temporary_car_image.jpg';
 
-import CarDetailsRow from './templates/CarDetailsRow';
+function CarDetailsRow(props) {
+    return(
+        <tr>
+            <td className="align-middle" scope="row">{ props.num }</td>
+            <td className="align-middle">
+                <img 
+                    src={ props.img }
+                    width="100"
+                    alt={ props.title }
+                />
+            </td>
 
-class Cars extends Component {
+            <td className="align-middle">
+                <ul className="list-unstyled">
+                    <li><h6 className="font-weight-bolder">{ props.title }</h6></li>
+                    <li>Transmission: { props.transmission }</li>
+                    <li>Number of Seat: { props.numSeat }</li>
+                </ul>
+            </td>
+
+            <td className="align-middle">
+                ${ props.price } / hr
+            </td>
+
+            <td className="align-middle">
+                {
+                    (props.status === 'available') ? 
+                    <span className="badge badge-success">Available</span> : 
+                    <span className="badge badge-danger">Unavailable</span>
+                }
+            </td>
+
+            <td className="align-middle text-right">
+                <Link to="/" className="btn btn-primary btn-sm mr-2">
+                    <i className="fas fa-eye small mr-1"></i> View
+                </Link>
+            </td>
+        </tr>
+    );
+}
+
+class Rentals extends Component {
 
     /**
      * Constructor for Notifications
@@ -44,7 +83,7 @@ class Cars extends Component {
 
         // Get list of cars
         axios.get(
-            process.env.REACT_APP_API_URL + '/users/cars', {
+            process.env.REACT_APP_API_URL + '/users/rentals', {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
@@ -71,10 +110,9 @@ class Cars extends Component {
                     <b>Cars</b>
 
                     <div>
-                        <Link to="/dashboard/cars/add" className="btn btn-success btn-sm">
-                            <i className="fas fa-plus small"></i>
-                            <span className="ml-1">Add Car</span>
-                        </Link>
+                        <a href="/cars" className="btn btn-secondary btn-sm">
+                            <span className="ml-1">Browse Cars</span>
+                        </a>
                     </div>
                 </nav>
 
@@ -151,4 +189,4 @@ class Cars extends Component {
     }
 }
 
-export default Cars;
+export default Rentals;
