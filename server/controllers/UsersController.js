@@ -39,15 +39,15 @@ var UserController = module.exports = {
         const userType        = req.body.user_type;
 
         let ethAccount = req.body.ethereum_address;
-        let privateKey = req.body.private_key;
+        let ethPrivateKey = req.body.ethereum_private_key;
 
         // Make sure there is '0x' at the front
         if (ethAccount.substring(0, 2) != '0x') {
             ethAccount = '0x' + ethAccount;
         }
 
-        if (privateKey.substring(0, 2) != '0x') {
-            privateKey = '0x' + privateKey;
+        if (ethPrivateKey.substring(0, 2) != '0x') {
+            ethPrivateKey = '0x' + ethPrivateKey;
         }
 
         // For connecting to ethereum account
@@ -113,13 +113,30 @@ var UserController = module.exports = {
             }
 
             // Verify ethereum account
-            if (CarNet.verifyAccount(ethAccount, privateKey) === false) {
+            if (ethAccount.length < 40 || ethAccount.length > 42) {
                 errors.push(
                     {
-                        message: "Could not connect to Ethereum account.",
+                        message: "Invalid Ethereum Address",
                         field: "ethereum_address"
                     }
-                )
+                );
+            } else if (ethPrivateKey.length < 64 || ethPrivateKey.length > 66) {
+                errors.push(
+                    {
+                        message: "Invalid Ethereum Private Key",
+                        field: "ethereum_private_key"
+                    }
+                );
+            } else {
+
+                if (CarNet.verifyAccount(ethAccount, ethPrivateKey) === false) {
+                    errors.push(
+                        {
+                            message: "Could not connect to Ethereum account.",
+                            field: "ethereum_address"
+                        }
+                    )
+                }
             }
         }
 
@@ -146,7 +163,7 @@ var UserController = module.exports = {
                         type            : userType,
                         img             : '',
                         eth_account     : ethAccount,
-                        eth_private_key : privateKey,
+                        eth_private_key : ethPrivateKey,
                         token           : '',
                         created_at      : moment().format('YYYY-MM-DD')
                     }
@@ -182,6 +199,8 @@ var UserController = module.exports = {
         // Get user
         const [users, fields] = await DB.execute('SELECT * FROM `users` WHERE `email` = ?', [email]);
 
+        var user;
+
         // Check if user exists
         if (users.length == 0) {
             errors.push(
@@ -190,18 +209,19 @@ var UserController = module.exports = {
                     field: 'email'
                 }
             );
-        }
+        } else {
 
-        const user = users[0];
+            user = users[0];
 
-        // Validate user password
-        if (passwordHash.verify(password, user.password) == false) {
-            errors.push(
-                {
-                    message: 'Incorrect password.',
-                    field: 'password'
-                }
-            );
+            // Validate user password
+            if (passwordHash.verify(password, user.password) == false) {
+                errors.push(
+                    {
+                        message: 'Incorrect password.',
+                        field: 'password'
+                    }
+                );
+            }
         }
 
         // Check if validation passed

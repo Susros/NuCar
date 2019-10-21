@@ -8,14 +8,108 @@
  */
 
 import React, { Component } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 import AppNavbar from './components/navbar/AppNavbar';
 
 import temporary_car_image from './img/temporary_car_image.jpg';
 
+function ucwords(str) {
+    return (str + '')
+    .replace(/^(.)|\s+(.)/g, function ($1) {
+      return $1.toUpperCase()
+    })
+}
+
+function formatDate(date) {
+    let d = new Date(date);
+    return d.getDate() + "/" + parseInt(d.getMonth() + 1) + "/" + d.getFullYear();
+}
+
 class CarView extends Component {
 
+    /**
+     * Cosntructor for CarView
+     * @param {Object} props 
+     */
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            car: null,
+            isloading: true,
+            carId: 0
+        }
+    }
+
+    /** 
+     * After component is loaded
+     */
+    componentDidMount() {
+        const carId = this.props.match.params.carId;
+
+        // Get individual car
+        axios.get(
+            process.env.REACT_APP_API_URL + '/cars/' + carId, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                withCredentials: true
+            }
+        ).then(({ data }) => {
+            this.setState({ car: data.data, isloading: false });
+        }).catch(err => {
+            this.setState({ isloading: false });
+        });
+    }
+
+    bookCar = (event) => {
+        event.preventDefault();
+
+        const carId = this.props.match.params.carId;
+
+        var btn = document.getElementById('book-btn');
+        btn.setAttribute("disabled", "disabled");
+
+        axios.post(
+            process.env.REACT_APP_API_URL + '/cars/' + carId + '/book',
+            {
+                car_id: carId
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                withCredentials: true
+            }
+        ).then(res => {
+            this.props.history.push('/dashboard/rentals');
+        }).catch(err => {
+
+            btn.removeAttribute('disabled');
+
+            document.getElementById('error-display').classList.remove('d-none');
+            document.getElementById('error-display').innerHTML = "There is an error.";
+            console.log(err);
+        });
+    }
+
     render() {
+
+        if (this.state.isloading) {
+            return null;
+        }
+
+        if (this.state.car == null) {
+            return (
+                <div className="alert alert-danger"><h1>404</h1></div>
+            );
+        }
+
         return(
             <div>
                 <AppNavbar />
@@ -26,8 +120,7 @@ class CarView extends Component {
                             <img
                                 src={ temporary_car_image }
                                 className="w-100"
-                                alt=""
-                                title=""
+                                alt={ this.state.car.make + " " + this.state.car.model }
                             />
 
                             <div className="my-3 p-3 border-top border-bottom d-flex justify-content-between">
@@ -40,7 +133,7 @@ class CarView extends Component {
                                 <span>Seden</span>
                                 <span>&bull;</span>
 
-                                <span>Automatic</span>
+                                <span>{ ucwords(this.state.car.transmission) }</span>
                             </div>
 
                             <div className="my-3">
@@ -80,7 +173,7 @@ class CarView extends Component {
                             <div className="my-3">
                                 <h5>Availability</h5>
 
-                                <p>This car is available from 20 October 2019 - 30 November 2019</p>
+                                <p>This car is available from { formatDate(this.state.car.available_from) } - { formatDate(this.state.car.available_to) }</p>
                             </div>
 
                             <hr />
@@ -112,14 +205,14 @@ class CarView extends Component {
                         </div>
 
                         <div className="col-5">
-                            <h2>Toyota Corolla Ascent 2008</h2>
-                            <p><i className="fas fa-map-marker-alt"></i> Waratah, NSW 2298</p>
+                            <h2>{ this.state.car.make + " " + this.state.car.model }</h2>
+                            <p><i className="fas fa-map-marker-alt"></i> { this.state.car.address }</p>
 
                             <hr />
 
                             <h5>Book this car</h5>
 
-                            <form>
+                            <form onSubmit={ this.bookCar }>
                                 <div className="form-row">
                                     <div className="col-6">
                                         <div className="form-group">
@@ -130,7 +223,7 @@ class CarView extends Component {
                                                     </span>
                                                 </div>
 
-                                                <input type="date" name="pickup_date" className="form-control" id="pickup-date-input" />
+                                                <input type="date" name="pickup_date" className="form-control" id="pickup-date-input" placeholder="DD/MM/YYYY" />
                                             </div>
                                         </div>
                                     </div>
@@ -144,24 +237,30 @@ class CarView extends Component {
                                                     </span>
                                                 </div>
 
-                                                <input type="date" name="return_date" className="form-control" id="return-date-input" />
+                                                <input type="date" name="return_date" className="form-control" id="return-date-input" placeholder="DD/MM/YYYY"/>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="alert alert-danger">This car is not available withing this time frame.</div>
+                                { /* <div className="alert alert-danger">This car is not available withing this time frame.</div> */ }
 
                                 <hr />
 
-                                <div className="form-row align-items-center">
-                                    <div className="col-6">
-                                        <b className="h2">$20</b><sub className="lead"> / hour</sub>
-                                    </div>
+                                <div className="form-group">
+                                    <div className="form-row align-items-center">
+                                        <div className="col-6">
+                                            <b className="h2">${ this.state.car.price }</b><sub className="lead"> / hour</sub>
+                                        </div>
 
-                                    <div className="col-6">
-                                        <input type="submit" value="Book" className="btn btn-primary btn-lg w-100" />
+                                        <div className="col-6">
+                                            <input type="submit" value="Book" className="btn btn-primary btn-lg w-100" id="book-btn" />
+                                        </div>
                                     </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <div className="alert alert-danger d-none" role="alert" id="error-display"></div>
                                 </div>
 
                             </form>

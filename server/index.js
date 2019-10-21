@@ -27,12 +27,14 @@ const express      = require('express');
 const bodyParser   = require('body-parser');
 const helmet       = require('helmet');
 const cookieparser = require('cookie-parser');
+const cors         = require('cors');
 
 const app = express();
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieparser());
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 
 // Listen
 app.listen(process.env.PORT);

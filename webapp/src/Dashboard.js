@@ -6,13 +6,16 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
+import axios from 'axios';
 
 import Notifications from './dashboard/Notifications';
 import Messages from './dashboard/Messages';
 import Cars from './dashboard/Cars';
+import Rentals from './dashboard/Rentals';
 import AddCar from './dashboard/AddCar';
 
 import v_logo_light from './img/v_logo_light.png';
+import profile_img from './img/profile_img.jpg';
 
 class Dashboard extends Component {
     /**
@@ -22,9 +25,43 @@ class Dashboard extends Component {
      */
     constructor(props) {
         super(props);
+
+        this.state = {
+            user: null,
+            isloading: true
+        }
+    }
+
+    /**
+     * After component is loaded
+     */
+    componentDidMount() {
+
+        // Get user details
+        axios(
+            process.env.REACT_APP_API_URL + '/users', 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                withCredentials: true
+            }
+        ).then(({ data }) => {
+            this.setState({ user: data.data, isloading: false });
+        }).catch(err => {
+            this.setState({ user: null, isloading: false });
+        });
+
     }
 
     render() {
+
+        if (this.state.isloading) {
+            return null;
+        }
+
         return(
             <div>
                 <BrowserRouter>
@@ -44,48 +81,53 @@ class Dashboard extends Component {
                                     <span>
                                         <i className="fas fa-bell mr-1"></i> Notifications
                                     </span>
-                                    <span class="badge badge-primary badge-pill">0</span>
+                                    <span className="badge badge-primary badge-pill">0</span>
                                 </Link>
 
                                 <Link to="/dashboard/messages" className="dashboard-nav-item  list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="dashboard-nav-messages">
                                     <span>
                                         <i className="fas fa-envelope mr-1"></i> Messages
                                     </span>
-                                    <span class="badge badge-primary badge-pill">0</span>
+                                    <span className="badge badge-primary badge-pill">0</span>
                                 </Link>
-
-                                <Link to="/dashboard/cars" className="dashboard-nav-item list-group-item list-group-item-action" id="dashboard-nav-cars">
-                                    <i className="fas fa-car mr-1"></i> Cars
-                                </Link>
+                                {
+                                    (this.state.user.type == 'owner') ?
+                                        <Link to="/dashboard/cars" className="dashboard-nav-item list-group-item list-group-item-action" id="dashboard-nav-cars">
+                                            <i className="fas fa-car mr-1"></i> Cars
+                                        </Link>
+                                    :
+                                        <Link to="/dashboard/rentals" className="dashboard-nav-item list-group-item list-group-item-action" id="dashboard-nav-cars">
+                                            <i className="fas fa-car mr-1"></i> Rentals
+                                        </Link>
+                                }
                             </div>
                         </div>
 
                         <div id="dashboard-profile-btn-container">
                             <div className="border-top border-secondary">
-                                <div class="dropright">
+                                <div className="dropright">
                                     <div className="dropdown-toggle cursor-pointer px-3 py-2" id="dashboard-profile-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <div class="row align-items-center">
-                                            <div class="col-10">
+                                        <div className="row align-items-center">
+                                            <div className="col-10">
                                                 <img 
-                                                    src="https://scontent.fsyd6-1.fna.fbcdn.net/v/t1.0-1/c0.0.160.160a/p160x160/66632445_1111377929047906_2551103770872250368_n.jpg?_nc_cat=100&_nc_oc=AQlHQix0ZcfkWRGTrvYKPKsWGb_jbpljmHLZ2Y2yTMIPWKEqqW-EhnwKrPk2UaMtrj4&_nc_ht=scontent.fsyd6-1.fna&oh=1af0b37b2bf2c20faf75ed96a78795db&oe=5E17AEB5"
+                                                    src={ profile_img }
                                                     width="32"
                                                     height="32"
-                                                    alt=""
-                                                    title=""
+                                                    alt={ this.state.user.first_name + " " + this.state.user.last_name }
                                                     className="rounded-circle"
                                                 />
 
-                                                <span className="ml-2 text-light">First Name</span>
+                                                <span className="ml-2 text-light">{ this.state.user.first_name + " " + this.state.user.last_name }</span>
                                             </div>
-                                            <div class="col-2">
-                                                <div class="text-right text-secondary small">
+                                            <div className="col-2">
+                                                <div className="text-right text-secondary small">
                                                     <i className="fas fa-ellipsis-v"></i>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="dropdown-menu" aria-labelledby="dashboard-profile-dropdown">
+                                    <div className="dropdown-menu" aria-labelledby="dashboard-profile-dropdown">
                                         <a href="/" className="dropdown-item">Settings</a>
                                         <a href="/" className="dropdown-item">Logout</a>
                                     </div>
@@ -108,9 +150,14 @@ class Dashboard extends Component {
                                 <Cars />
                             </Route>
 
+                            <Route exact path="/dashboard/rentals">
+                                <Rentals />
+                            </Route>
+
                             <Route exact path="/dashboard/cars/add">
                                 <AddCar />
                             </Route>
+
                         </Switch>
                     </div>
                 </BrowserRouter>
