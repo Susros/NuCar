@@ -13,7 +13,6 @@ const Web3            = require('web3');
 const fs              = require('fs');
 const TruffleContract = require('@truffle/contract');
 const ethereumjsAbi   = require('ethereumjs-abi');
-const truffleConfig   = require('../truffle-config');
 
 module.exports = {
     web3Provider : null,
