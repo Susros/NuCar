@@ -1,7 +1,12 @@
 /**
- * CarNet JavaScript library for CarNet contract
+ * A library for CarNet smart contract using web3js Ethereum API.
+ * 
+ * This module deploys smart contract and do the transaction by using
+ * truffle module.
  * 
  * @author Kelvin Yin
+ * @since 1.0.0
+ * @version 1.0.0
  */
 
 const Web3            = require('web3');
@@ -13,12 +18,12 @@ const truffleConfig   = require('../truffle-config');
 module.exports = {
     web3Provider : null,
     contracts : {},
-    ethereumServer: 'http://' + truffleConfig.networks.development.host + ':' + truffleConfig.networks.development.port,
+    ethereumServer: process.env.ETH_SERVER,
 
     /**
-     * Initialise CarNet contract
+     * Initialise CarNet contract.
      * 
-     * This method initialise web3 provider and and contract
+     * This method initialise web3 provider and and contract.
      */
     init: function() {
 
@@ -42,13 +47,16 @@ module.exports = {
     },
 
     /**
-     * Add car into blockchain.
+     * Add car signature into blockchain.
+     * 
+     * This method deploy CarNet smart contract and sends the signature
+     * to Blockchain to add a car.
      * 
      * @param {string} carHash    Unique hash code for car to be added.
      * @param {string} ethAccount The ethereum address of the car owner.
      * @param {string} privateKey Private key of the ethereum address.
      * 
-     * @returns Contract transaction.
+     * @returns Contract transaction receipt.
      */
     addCar: async function(carHash, ethAccount, privateKey) {
         
@@ -70,16 +78,17 @@ module.exports = {
         return await instance.addCar(
             web3.utils.fromAscii(carHash),
             signature, 
-            { 
-                from: ethAccount,
-                gas: 3000000 
-            }
+            { from: ethAccount, gas: 3000000 }
         );
 
     },
 
     /**
-     * Add rent car information into block chain
+     * Add signature of rent car information into blockchain.
+     * 
+     * This method deploy smart contract and send the signature to
+     * blockchain to proceed renting. It also sends car owner ethereum
+     * address to verify the user.
      * 
      * @param {string} carHash          Unique hash code for car
      * @param {string} ownerEthAccount  Ethereum address of the owner
@@ -109,19 +118,21 @@ module.exports = {
             web3.utils.fromAscii(carHash),
             ownerEthAccount,
             signature,
-            {
-                from: ethAccount,
-                gas: 300000 
-            }
+            { from: ethAccount, gas: 300000 }
         );
     },
 
     /**
-     * Add return car information into blockchain
+     * Add signature or return car information into blockchain.
+     * 
+     * This method deploy smart contract and verify the signature
+     * of both owner and borrower.
      * 
      * @param {string} carHash          Unique hash code for car
      * @param {string} ownerEthAccount  Ethereum address of car owner
      * @param {string} ethAccount       Ethereum address of car borrower
+     * 
+     * @return Blockchain transaction receipt.
      */
     returnCar: async function(carHash, ownerEthAccount, ethAccount) {
 
@@ -138,7 +149,10 @@ module.exports = {
     },
 
     /**
-     * Verify the account
+     * Verify Ethereum account.
+     * 
+     * This method verify if the provided private key is belong
+     * to Ethereum account address.
      * 
      * @param {string} ethAccount Ethereum address of user
      * @param {string} privateKey Private key to the account
@@ -148,6 +162,7 @@ module.exports = {
     verifyAccount: function(ethAccount, privateKey) {
 
         const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+
         if (account.address == ethAccount) {
             return true;
         } else {
