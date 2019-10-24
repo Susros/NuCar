@@ -88,6 +88,21 @@ var UserDAO = module.exports = {
 
         return await DB.execute(mysql.format('INSERT INTO `users` SET ? ', userData));
 
+    },
+
+    /**
+     * Update user in database.
+     * 
+     * This method accept all object with valid table fields then upadte
+     * the values in database.
+     * 
+     * @param {Object} userData 
+     * @param {int}    id       User Id
+     * 
+     * @return Promise
+     */
+    updateUser: async (userData, id) => {
+        return await DB.execute(mysql.format('UPDATE `users` SET ? WHERE `id` = ?', [userData, id]));
     }
 
 }
