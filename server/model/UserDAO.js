@@ -42,37 +42,31 @@ var UserDAO = module.exports = {
     },
 
     /**
-     * Check if user already exists.
+     * Check if email exists.
      * 
-     * This method checks if either email or ethereum account exists
-     * in the databse.
+     * This method check if user email is already registered in the database.
      * 
-     * @param {string} email      Email account of user.
-     * @param {string} ethAccount Ethereum account address of user
+     * @param {string} email Email account of user.
      * 
      * @return True if it exists, false otherwise.
      */
-    userExists: async (email, ethAccount) => {
-       
-        // Set ethereum account variable to empty string if not present
-        ethAccount = ethAccount || "";
+    emailExists: async (email) => {
+        const [userQueryResults, userQueryFields] = await DB.execute('SELECT * from `users` WHERE `email` = ?', [email]);
+        return (userQueryResults.length > 0);
+    },
 
-        // Values to be executed
-        let sqlValues = [email];
-
-        // SQL to query
-        let sql = 'SELECT * FROM `users` WHERE `email` = ?';
-
-        if (ethAccount != "") {
-            sql += " OR `eth_account` = ?";
-            sqlValues.push(ethAccount);
-        }
-
-        // Get query
-        const [userQueryResults, userQueryFields] = await DB.execute(sql, sq.sqlValues);
-
-        return userQueryResults.length > 0;
-
+    /**
+     * Check if ethereum account already exists.
+     * 
+     * This method check if ethereum account already in database.
+     * 
+     * @param {string} ethAccount Ethereum account of user.
+     * 
+     * @return True if it exists, false otherwise.
+     */
+    ethAccountExists: async (ethAccount) => {
+        const [userQueryResults, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `eth_account` = ?', [ethAccount]);
+        return (userQueryResults.length > 0);
     },
 
     /**
