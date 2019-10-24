@@ -1,5 +1,5 @@
 /**
- * Controller for users routes
+ * This controllers handles Users APIs.
  * 
  * @author Kelvin Yin
  */
@@ -10,10 +10,12 @@ const mysql        = require('mysql2');
 const moment       = require('moment');
 const CarNet       = require('../blockchain/js/CarNet');
 
+const UserDAO      = require('../model/UserDAO');
+
 var UserController = module.exports = {
 
     /**
-     * Register users
+     * This method handle user registration.
      * 
      * POST: /users/register
      *
@@ -25,8 +27,8 @@ var UserController = module.exports = {
      *  - confirm_password
      *  - type
      * 
-     * @param {HTTPRequest}  req 
-     * @param {HTTPResponse} res 
+     * @param {Request}  req 
+     * @param {Response} res 
      */
     register: async function(req, res) {
 
@@ -37,9 +39,9 @@ var UserController = module.exports = {
         const password        = req.body.password;
         const confirmPassword = req.body.confirm_password;
         const userType        = req.body.user_type;
-
-        let ethAccount = req.body.ethereum_address;
-        let ethPrivateKey = req.body.ethereum_private_key;
+        
+        let ethAccount        = req.body.ethereum_address;
+        let ethPrivateKey     = req.body.ethereum_private_key;
 
         // Make sure there is '0x' at the front
         if (ethAccount.substring(0, 2) != '0x') {
@@ -344,6 +346,8 @@ var UserController = module.exports = {
         const token_decoded = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
 
         const [userQueryResults, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [token_decoded.id]);
+
+        const test = UserDAO.getUserById(token_decoded.id);
 
         if (userQueryResults.length > 0) {
 
