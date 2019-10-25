@@ -6,8 +6,8 @@
  * @version 1.0.0
  */
 
-const mysql        = require('mysql2');
-const moment       = require('moment');
+const mysql  = require('mysql2');
+const moment = require('moment');
 
 module.exports = {
 
