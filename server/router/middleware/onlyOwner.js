@@ -2,6 +2,8 @@
  * This middleware make sure only onwer can access
  * 
  * @author Kelvin Yin
+ * @since 1.0.0
+ * @version 1.0.0
  */
 
 const jwt = require('jsonwebtoken');

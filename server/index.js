@@ -2,6 +2,8 @@
  * NuCar API Server
  * 
  * @author Kelvin Yin
+ * @since 1.0.0
+ * @version 1.0.0
  */
 
 // Set up environment

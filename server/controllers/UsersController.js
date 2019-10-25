@@ -98,6 +98,25 @@ var UserController = module.exports = {
     },
 
     /**
+     * Check if the user is already loggedin.
+     * 
+     * This method will only be called when the auth middleware
+     * validation is passed.
+     * 
+     * @param {HTTPRequest}  req
+     * @param {HTTPResponse} res
+     */
+    isLoggedin: async(req, res) => {
+        res.status(200).json(
+            {
+                data: {
+                    isLoggedin: true
+                }
+            }
+        );
+    },
+
+    /**
      * Get list of owner cars
      * 
      * @param {HTTPRequest}  req 
