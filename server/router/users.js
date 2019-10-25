@@ -2,6 +2,8 @@
  * API Router for users
  * 
  * @author Kelvin Yin
+ * @since 1.0.0
+ * @version 1.0.0
  */
 
 const express = require('express');
@@ -24,15 +26,7 @@ router.post('/register', usersController.register);
 router.post('/login', usersController.login);
 
 // Check if logged in
-router.get('/login/check', auth, function(req, res) {
-    res.status(200).json(
-        {
-            data: {
-                isLoggedin: true
-            }
-        }
-    );
-});
+router.get('/login/check', auth, usersController.isLoggedin);
 
 // Get owner cars
 router.get('/cars', onlyOwner, usersController.getCars);
