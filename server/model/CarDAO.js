@@ -77,7 +77,7 @@ module.exports = {
      * 
      * @return List of cars.
      */
-    getCarByUserId: async (userId) => {
+    getCarsByUserId: async (userId) => {
         const [carQueryResults, carQueryFields] = await DB.execute('SELECT * FROM `cars` WHERE `user_id` = ? ORDER BY `id`', [userId]);
         return (carQueryResults.length > 0) ? carQueryResults : [];
     },
