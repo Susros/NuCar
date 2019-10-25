@@ -11,7 +11,7 @@
 const mysql        = require('mysql2');
 const moment       = require('moment');
 
-var UserDAO = module.exports = {
+module.exports = {
 
     /**
      * Get user by id.

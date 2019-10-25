@@ -4,11 +4,7 @@
  * @author Kelvin Yin
  */
 
-const passwordHash = require('password-hash');
 const jwt          = require('jsonwebtoken');
-const mysql        = require('mysql2');
-const moment       = require('moment');
-const CarNet       = require('../blockchain/js/CarNet');
 const UserDAO      = require('../model/UserDAO');
 const Validator   = require('../helpers/Validator');
 
