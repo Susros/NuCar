@@ -14,8 +14,6 @@ var UserController = module.exports = {
 
     /**
      * This method handle user registration.
-     * 
-     * POST: /users/register
      *
      * Form Data:
      *  - first_name
@@ -47,8 +45,6 @@ var UserController = module.exports = {
     /**
      * This method handle user login.
      * 
-     * POST: /users/login
-     * 
      * Form Data:
      *  - email
      *  - password
@@ -56,7 +52,7 @@ var UserController = module.exports = {
      * @param {HTTPRequest} req 
      * @param {HTTPResponse} res 
      */
-    login: async function(req, res) {
+    login: async (req, res) => {
 
         // Validate form data input
         let { errors, data } = await Validator.validate(req.body, { email: 'exists', password: 'verify' });
@@ -107,7 +103,7 @@ var UserController = module.exports = {
      * @param {HTTPRequest}  req 
      * @param {HTTPResponse} res 
      */
-    getCars: async function(req, res) {
+    getCars: async (req, res) => {
         
         // Get token decoded
         const T = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
@@ -123,7 +119,7 @@ var UserController = module.exports = {
      * @param {HTTPRequest}  req 
      * @param {HTTPResponse} res 
      */
-    getRentals: async function(req, res) {
+    getRentals: async (req, res) => {
 
         // Get token decoded
         const T = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
@@ -158,7 +154,7 @@ var UserController = module.exports = {
      * @param {HTTPRequest}  req 
      * @param {HTTPResponse} res 
      */
-    getUser: async function(req, res) {
+    getUser: async (req, res) => {
 
         // Get token decoded
         const T = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);

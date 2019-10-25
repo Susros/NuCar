@@ -4,14 +4,16 @@
  * @author Kelvin Yin
  */
 
-const passwordHash = require('password-hash');
-const jwt          = require('jsonwebtoken');
-const mysql        = require('mysql2');
-const moment       = require('moment');
-const CarNet       = require('../blockchain/js/CarNet');
-const crypto       = require('crypto');
+const jwt       = require('jsonwebtoken');
+const moment    = require('moment');
+const CarNet    = require('../blockchain/js/CarNet');
+const crypto    = require('crypto');
 
-var CarsController = module.exports = {
+const UserDAO   = require('../model/UserDAO');
+const CarDAO    = require('../model/CarDAO');
+const RentalDAO = require('../model/RentalDAO');
+
+module.exports = {
 
     /**
      * Add new car
@@ -21,57 +23,34 @@ var CarsController = module.exports = {
      * @param {HTTPRequest}  req 
      * @param {HTTPResponse} res 
      */
-    addCar: function(req, res) {
+    addCar: async (req, res) => {
 
         // Get data from post
         // [TODO: This need to be validated]
-        let postData = req.body;
+        let formData = req.body;
 
         // Get token decoded
-        const token_decoded = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
+        const T = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
 
-        postData.user_id = token_decoded.id;
-        postData.hash = crypto.createHash('md5').update(postData.model + postData.make + postData.user_id + (new Date()).getTime()).digest('hex');
-        postData.created_at = moment().format("YYYY-MM-DD");
+        formData.user_id = token_decoded.id;
+        formData.hash = crypto.createHash('md5').update(postData.model + postData.make + postData.user_id + (new Date()).getTime()).digest('hex');
 
-        // Get user private key
-        DB.execute(
-            mysql.format('SELECT `eth_private_key` FROM `users` WHERE `id` = ?', [token_decoded.id]), 
-            (err, results, fields) => {
-                if (err) throw err;
+        // Get user
+        const user = await UserDAO.getUserById(T.id);
 
-                const privateKey = results[0].eth_private_key;
+        // Add to blockchain
+        CarNet.init();
+        CarNet.addCar(postData.hash, T.eth_account, user.eth_private_key)
+        .then(async transactionResult => {
 
-                // Add to blockchain
-                CarNet.init();
-                CarNet.addCar(postData.hash, token_decoded.eth_account, privateKey)
-                    .then(transactionResult => {
-                        console.log(transactionResult);
+            // Add to database
+            await CarDAO.addCar(postData);
 
-                        // Add information into database
-                        DB.execute(
-                            mysql.format(
-                                'INSERT INTO `cars` SET ?',
-                                postData
-                            ),
-                            (insertErr, insertResults, insertFields) => {
-                                if (insertErr) throw insertErr;
-
-                                res.status(200).json(
-                                    {
-                                        data : {
-                                            transaction: transactionResult
-                                        }
-                                    }
-                                );
-                            }
-                        );
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
-            }
-        );
+            res.status(200).json({ data: transactionResult })
+        })
+        .catch(err => {
+            console.log(err);
+        });
     },
 
     /**
@@ -82,68 +61,46 @@ var CarsController = module.exports = {
      * @param {HTTPRequest}  req 
      * @param {HTTPResponse} res 
      */
-    rentCar: async function(req, res) {
+    rentCar: async (req, res) => {
 
         // Get token decoded
-        const token_decoded = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
+        const T = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
     
         // Get car id
         const carId = req.params.id;
 
         // Get car
-        const [carQueryResults, carQueryFields] = await DB.execute('SELECT * FROM `cars` WHERE `status` = ? AND `id` = ?', ['available', carId]);
 
-        if (carQueryResults.length > 0) {
+        const car = await CarDAO.getCarById(carId);
 
-            const car = carQueryResults[0];
+        if (Object.keys(car).length > 0 && car.status == 'available') {
 
             // Get owner details
-            const [ownerQueryResults, ownerQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [car.user_id]);
-            const owner = ownerQueryResults[0];
+            const owner = await UserDAO.getUserById(car.user_id);
 
             // Get user detail
-            const [userQueryResult, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [token_decoded.id]);
-            const user = userQueryResult[0];
+            const user = await UserDAO.getUserById(T.id);
 
             // Add to blockchain
             CarNet.init();
             CarNet.rentCar(car.hash, owner.eth_account, user.eth_account, user.eth_private_key)
-                .then(async transactionResult => {
-                    
-                    // Update car status
-                    await DB.execute('UPDATE `cars` SET `status` = ? WHERE `id` = ?', ['unavailable', carId]);
+            .then(async transactionResult => {
+                
+                // Update car status
+                await CarDAO.updateCar({ status: 'unavailable' }, carId);
 
-                    // Add rental information
-                    await DB.execute(
-                        mysql.format(
-                            'INSERT INTO `rental` SET ?',
-                            {
-                                car_id: carId,
-                                user_id: user.id,
-                                return_at: null,
-                                created_at: moment().format("YYYY-MM-DD")
-                            }
-                        )
-                    );
+                // Add rental information
+                await RentalDAO.addRental({ car_id: carId, user_id: user.id });
 
-                    console.log(transactionResult);
+                res.status(200).json({ data: transactionResult });
 
-                    res.status(200).json(
-                        {
-                            data: transactionResult
-                        }
-                    )
+            })
+            .catch(err => {
+                console.log(err);
+            });
 
-                })
-                .catch(err => {
-                    console.log(err);
-                });
         } else {
-            res.status(404).json(
-                {
-                    message: "Car not found."
-                }
-            )
+            res.status(404).json({ message: "Car not found." });
         }
 
     },
@@ -151,75 +108,60 @@ var CarsController = module.exports = {
     /**
      * Return the car
      * 
+     * Precondition: User has already logged in and is borrower type
+     * 
      * @param {HTTPRequest}  req 
      * @param {HTTPResponse} res 
      */
-    returnCar: async function(req, res) {
+    returnCar: async (req, res) => {
         
         // Get token decoded
-        const token_decoded = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
+        const T = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
     
         // Get rental id
         const rentalId = req.params.id;
 
         // Get rental
-        const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rental` WHERE `id` = ? AND `user_id` = ?', [rentalId, token_decoded.id]);
+        const rental = await RentalDAO.getRentalById(rentalId);
 
-        if (rentalQueryResults.length > 0) {
-            const rental = rentalQueryResults[0];
+        if (Object.keys(rental).length > 0) {
 
-            // Get car
-            const [carQueryResults, carQueryFields] = await DB.execute('SELECT * FROM `cars` WHERE `status` = ? AND `id` = ?', ['unavailable', rental.car_id]);
+            // Get Car
+            const car = await CarDAO.getCarById(rental.car_id);
 
-            if (carQueryResults.length > 0) {
-
-                const car = carQueryResults[0];
+            // Make sure car status is unavailable
+            if (car.status == 'unavailable') {
     
                 // Get owner details
-                const [ownerQueryResults, ownerQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [car.user_id]);
-                const owner = ownerQueryResults[0];
+                const owner = await UserDAO.getUserById(car.user_id);
     
                 // Get user detail
-                const [userQueryResult, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [token_decoded.id]);
-                const user = userQueryResult[0];
+                const user = await UserDAO.getUserById(T.id);
     
                 // Add to blockchain
                 CarNet.init();
                 CarNet.returnCar(car.hash, owner.eth_account, user.eth_account)
-                    .then(async transactionResult => {
-                        
-                        // Update car status
-                        await DB.execute('UPDATE `cars` SET `status` = ? WHERE `id` = ?', ['available', car.id]);
-    
-                        // Add rental information
-                        await DB.execute('UPDATE `rental` SET `return_at` = ? WHERE `id` = ? AND `car_id` = ? AND `user_id` = ?', [moment().format('YYYY-MM-DD'), rentalId, car.id, user.id]);
-    
-                        console.log(transactionResult);
-    
-                        res.status(200).json(
-                            {
-                                data: transactionResult
-                            }
-                        )
-    
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
+                .then(async transactionResult => {
+
+                    // Update car status
+                    await CarDAO.updateCar({ status: 'available' }, car.id);
+
+                    // Update rental
+                    await RentalDAO.updateRental({ returned_at: moment().format('YYYY-MM-DD') }, rentalId);
+
+                    res.status(200).json({ data: transactionResult });
+
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+
             } else {
-                res.status(404).json(
-                    {
-                        message: "Car not found."
-                    }
-                );
+                res.status(404).json({ message: "Car not found." });
             }
 
         } else {
-            res.status(404).json(
-                {
-                    message: "Rental not found."
-                }
-            );
+            res.status(404).json({ message: "Rental not found." });
         }
 
     },
@@ -230,18 +172,12 @@ var CarsController = module.exports = {
      * @param {HTTPRequest}  req 
      * @param {HTTPResponse} res 
      */
-    getCarsList: function(req, res) {
+    getCarsList: async (req, res) => {
 
         // Get all available cars
-        DB.query('SELECT * FROM `cars` WHERE `status` = "available" ORDER BY `id`', (err, results, fields) => {
-            if (err) throw err;
+        const cars = await CarDAO.getAvailableCars();
 
-            res.status(200).json(
-                {
-                    data: results
-                }
-            );
-        });
+        res.status(200).json({ data: cars });
 
     },
 
@@ -251,27 +187,18 @@ var CarsController = module.exports = {
      * @param {HTTPRequest}  req
      * @param {HTTPResponse} res
      */
-    getCar: function(req, res) {
+    getCar: async (req, res) => {
 
         // Get car id
         const carId = req.params.id;
 
-        // Get car
-        DB.query(
-            mysql.format(
-                'SELECT * FROM `cars` WHERE `status` = "available" AND `id` = ?', [carId]
-            ), (err, results, fields) => {
-                if (results.length > 0) {
-                    res.status(200).json({
-                        data: results[0]
-                    });
-                } else {
-                    res.status(404).json({
-                        message: "Car not found"
-                    });
-                }
-            }
-        )
+        const car = await CarDAO.getCarById(carId);
+
+        if (Object.keys(car).length > 0) {
+            res.status(200).json({ data: car });
+        } else {
+            res.status(400).json({ message: 'Car not found.' });
+        }
 
     }
 

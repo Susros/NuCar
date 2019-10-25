@@ -23,7 +23,8 @@ module.exports = {
      */
     addRental: async (rentalData) => {
         // Add created date
-        rentalData.created_at = moment().format("YYYY-MM-DD");
+        rentalData.created_at  = moment().format("YYYY-MM-DD");
+        rentalData.returned_at = null;
 
         return await DB.execute(mysql.format('INSERT INTO `rentals` SET ?', rentalData));
     },
@@ -39,7 +40,7 @@ module.exports = {
      * 
      * @return Promise.
      */
-    udpateRental: async (rentalData, id) => {
+    updateRental: async (rentalData, id) => {
         return await DB.execute(mysql.format('UPDATE `rentals` SET ? WHERE `id` = ?', [rentalData, id]));
     },
 
@@ -55,6 +56,20 @@ module.exports = {
     getRentals: async (userId) => {
         const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ?', [userId]);
         return (rentalQueryResults.length > 0) ? rentalQueryResults : []
+    },
+
+    /**
+     * Get rental by id.
+     * 
+     * This method retrieve rental information by id.
+     * 
+     * @param {int} id
+     * 
+     * @return Rental information
+     */
+    getRentalById: async (id) => {
+        const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rentals` WHERE `id` = ?', [id]);
+        return (rentalQueryResults.length > 0) ? rentalQueryResults[0] : {}
     },
     
     /**
