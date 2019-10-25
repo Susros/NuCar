@@ -163,8 +163,6 @@ var UserController = module.exports = {
         // Get token decoded
         const T = jwt.verify(req.cookies.lg_token, process.env.JWT_SECRET_KEY);
 
-        const [userQueryResults, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [token_decoded.id]);
-
         const user = await UserDAO.getUserById(T.id);
 
         if (Object.keys(user).length > 0) {
