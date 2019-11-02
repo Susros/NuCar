@@ -30,8 +30,11 @@ router.post('/rental/:id/return', onlyBorrower, carsController.returnCar);
 // Get cars list
 router.get('/', carsController.getCarsList);
 
+// Get list of features
+router.get('/features', carsController.getFeatures);
+
 // Get individual car
-router.get('/:id', carsController.getCar)
+router.get('/:id', carsController.getCar);
 
 
 module.exports = router;

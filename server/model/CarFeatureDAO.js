@@ -16,7 +16,8 @@ module.exports = {
      * @return List of features of car.
      */
     getCarFeatures: async (carId) => {
-        return await DB.execute('SELECT * FROM `cars_features` WHERE `car_id` = ?', [carId]);
+        const [r, f] = await DB.execute('SELECT * FROM `cars_features` WHERE `car_id` = ?', [carId]);
+        return (r.length > 0) ? r : [];
     },
 
     /**
@@ -27,7 +28,8 @@ module.exports = {
      * @return List of car Ids.
      */
     getCarByFeatures: async (features) => {
-        return await DB.execute('SELECT `car_id` FROM `cars_features` WHERE `id` IN (?)', features);
+        const [r, f] = await DB.execute('SELECT `car_id` FROM `cars_features` WHERE `id` IN (?)', features);
+        return (r.length > 0) ? r : [];
     },
 
     /**

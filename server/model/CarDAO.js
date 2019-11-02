@@ -51,7 +51,8 @@ module.exports = {
      * @return List of all car.
      */
     getCars: async () => {
-        return await DB.execute('SELECT * FROM `cars` ORDER BY `id`');
+        const [r, f] = await DB.execute('SELECT * FROM `cars` ORDER BY `id`');
+        return (r.length > 0) ? r : [];
     },
 
     /**
@@ -64,8 +65,8 @@ module.exports = {
      * @return Car data.
      */
     getCarById: async (id) => {
-        const [carQueryResults, carQueryFields] = await DB.execute('SELECT * FROM `cars` WHERE `id` = ?', [id]);
-        return (carQueryResults.length > 0) ? carQueryResults[0] : {};
+        const [r, f] = await DB.execute('SELECT * FROM `cars` WHERE `id` = ?', [id]);
+        return (r.length > 0) ? r[0] : {};
     },
 
     /**
@@ -78,8 +79,8 @@ module.exports = {
      * @return List of cars.
      */
     getCarsByUserId: async (userId) => {
-        const [carQueryResults, carQueryFields] = await DB.execute('SELECT * FROM `cars` WHERE `user_id` = ? ORDER BY `id`', [userId]);
-        return (carQueryResults.length > 0) ? carQueryResults : [];
+        const [r, f] = await DB.execute('SELECT * FROM `cars` WHERE `user_id` = ? ORDER BY `id`', [userId]);
+        return (r.length > 0) ? r : [];
     },
 
     /**
@@ -90,7 +91,8 @@ module.exports = {
      * @return List of cars.
      */
     getAvailableCars: async () => {
-        return await DB.execute('SELECT * FROM `cars` WHERE `status` = ? ORDER BY `id`', ['available']);
+        const [r, f] = await DB.execute('SELECT * FROM `cars` WHERE `status` = ? ORDER BY `id`', ['available']);
+        return (r.length > 0) ? r : [];
     },
 
      /**
@@ -101,7 +103,8 @@ module.exports = {
      * @return List of cars.
      */
     getUnavailableCars: async () => {
-        return await DB.execute('SELECT * FROM `cars` WHERE `status` = ? ORDER BY `id`', ['unavailable']);
+        const [r, f] = await DB.execute('SELECT * FROM `cars` WHERE `status` = ? ORDER BY `id`', ['unavailable']);
+        return (r.length > 0) ? r : [];
     }
 
 }

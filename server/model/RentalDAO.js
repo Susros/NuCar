@@ -54,8 +54,8 @@ module.exports = {
      * @return List of rentals
      */
     getRentals: async (userId) => {
-        const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ?', [userId]);
-        return (rentalQueryResults.length > 0) ? rentalQueryResults : []
+        const [r, f] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ?', [userId]);
+        return (r.length > 0) ? r : []
     },
 
     /**
@@ -68,8 +68,8 @@ module.exports = {
      * @return Rental information
      */
     getRentalById: async (id) => {
-        const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rentals` WHERE `id` = ?', [id]);
-        return (rentalQueryResults.length > 0) ? rentalQueryResults[0] : {}
+        const [r, f] = await DB.execute('SELECT * FROM `rentals` WHERE `id` = ?', [id]);
+        return (r.length > 0) ? r[0] : {}
     },
     
     /**
@@ -83,8 +83,8 @@ module.exports = {
      * @return List of retals.
      */
     getReturnedRetals: async (userId) => {
-        const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ? AND `returned_at` IS NOT NULL', [userId]);
-        return (rentalQueryResults.length > 0) ? rentalQueryResults : [];
+        const [r, f] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ? AND `returned_at` IS NOT NULL', [userId]);
+        return (r.length > 0) ? r : [];
     },
 
     /**
@@ -98,8 +98,8 @@ module.exports = {
      * @return List of retals.
      */
     getCurrentRentals: async (userId) => {
-        const [rentalQueryResults, rentalQueryFields] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ? AND `returned_at` IS NULL', [userId]);
-        return (rentalQueryResults.length > 0) ? rentalQueryResults : [];
+        const [r, f] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ? AND `returned_at` IS NULL', [userId]);
+        return (r.length > 0) ? r : [];
     }
 
 }

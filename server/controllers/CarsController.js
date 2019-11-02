@@ -9,9 +9,10 @@ const moment    = require('moment');
 const CarNet    = require('../blockchain/js/CarNet');
 const crypto    = require('crypto');
 
-const UserDAO   = require('../model/UserDAO');
-const CarDAO    = require('../model/CarDAO');
-const RentalDAO = require('../model/RentalDAO');
+const UserDAO    = require('../model/UserDAO');
+const CarDAO     = require('../model/CarDAO');
+const RentalDAO  = require('../model/RentalDAO');
+const FeatureDAO = require ('../model/FeatureDAO');
 
 module.exports = {
 
@@ -200,6 +201,17 @@ module.exports = {
             res.status(400).json({ message: 'Car not found.' });
         }
 
+    },
+
+    /**
+     * Get all car features
+     * 
+     * @param {HTTPRequest}  req
+     * @param {HTTPResponse} res
+     */
+    getFeatures: async (req, res) => {
+        const features = await FeatureDAO.getFeatures();
+        res.status(200).json({ data: features });
     }
 
 }

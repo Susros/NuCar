@@ -23,8 +23,8 @@ module.exports = {
      * @return User information.
      */
     getUserById: async (id) => {
-        const [userQueryResults, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [id]);
-        return (userQueryResults.length > 0) ? userQueryResults[0] : {};
+        const [r, f] = await DB.execute('SELECT * FROM `users` WHERE `id` = ?', [id]);
+        return (r.length > 0) ? r[0] : {};
     },
 
     /**
@@ -37,8 +37,8 @@ module.exports = {
      * @return User information.
      */
     getUserByEmail: async (email) => {
-        const [userQueryResults, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `email` = ?', [email]);
-        return (userQueryResults.length > 0) ? userQueryResults[0] : {};
+        const [r, f] = await DB.execute('SELECT * FROM `users` WHERE `email` = ?', [email]);
+        return (r.length > 0) ? r[0] : {};
     },
 
     /**
@@ -51,8 +51,8 @@ module.exports = {
      * @return True if it exists, false otherwise.
      */
     emailExists: async (email) => {
-        const [userQueryResults, userQueryFields] = await DB.execute('SELECT * from `users` WHERE `email` = ?', [email]);
-        return (userQueryResults.length > 0);
+        const [r, f] = await DB.execute('SELECT * from `users` WHERE `email` = ?', [email]);
+        return (r.length > 0);
     },
 
     /**
@@ -65,8 +65,8 @@ module.exports = {
      * @return True if it exists, false otherwise.
      */
     ethAccountExists: async (ethAccount) => {
-        const [userQueryResults, userQueryFields] = await DB.execute('SELECT * FROM `users` WHERE `eth_account` = ?', [ethAccount]);
-        return (userQueryResults.length > 0);
+        const [r, f] = await DB.execute('SELECT * FROM `users` WHERE `eth_account` = ?', [ethAccount]);
+        return (r.length > 0);
     },
 
     /**
