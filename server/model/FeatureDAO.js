@@ -25,7 +25,7 @@ module.exports = {
      * @return Feature.
      */
     getFeatureById: async (id) => {
-        const [r, e] = await DB.execute('SELECT * FROM `features` WHERE `id` = ?', [id]);
+        const [r, f] = await DB.execute('SELECT * FROM `features` WHERE `id` = ?', [id]);
         return (r.length > 0) ? r[0] : {};
     },
 
@@ -37,7 +37,7 @@ module.exports = {
      * @return True if it does, false otherwise.
      */
     featureExists: async (id) => {
-        const [r, e] = await DB.execute('SELECT * FROM `features` WHERE `id` = ?', [id]);
+        const [r, f] = await DB.execute('SELECT * FROM `features` WHERE `id` = ?', [id]);
         return (r.length > 0);
     }
 
