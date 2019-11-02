@@ -15,7 +15,7 @@ module.exports = {
      */
     getFeatures: async () => {
         const [r, f] = await DB.execute('SELECT * FROM `features`');
-        return (r.length > 0) ? r ; [];
+        return (r.length > 0) ? r : [];
     },
 
     /**
