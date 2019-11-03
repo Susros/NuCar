@@ -78,7 +78,7 @@ class CarList extends Component {
 
         this.state = {
             cars: null,
-            isloading: true
+            features: null
         }
     }
 
@@ -86,6 +86,23 @@ class CarList extends Component {
      * After the component is loaded
      */
     componentDidMount() {
+
+        // Get list of features
+        axios.get(
+            process.env.REACT_APP_API_URL + '/cars/features', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                withCredentials: true
+            }
+        ).then(({ data }) => {
+            this.setState({ features: data.data });
+        }).catch(err => {
+            this.setState({ features: null });
+        });
+
         // Get list of cars
         axios.get(
             process.env.REACT_APP_API_URL + '/cars', {
@@ -97,15 +114,15 @@ class CarList extends Component {
                 withCredentials: true
             }
         ).then(({ data }) => {
-            this.setState({ cars: data.data, isloading: false });
+            this.setState({ cars: data.data });
         }).catch(err => {
-            this.setState({ isloading: false });
+            this.setState({ cars: null });
         });
     }
 
     render() {
 
-        if (this.state.isloading) {
+        if (this.state.features == null || this.state.cars == null) {
             return null;
         }
 
@@ -185,151 +202,22 @@ class CarList extends Component {
                                     <hr />
 
                                     <div className="form-group">
-                                        <label className="font-weight-bold">Type</label>
-                                        
-                                        <div className="form-row">
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="type-convertible-input" />
-                                                        <label className="custom-control-label" for="type-convertible-input">Convertible</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="type-seden-input" />
-                                                        <label className="custom-control-label" for="type-seden-input">Seden</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="type-hatch-input" />
-                                                        <label className="custom-control-label" for="type-hatch-input">Hatch Back</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="type-suv-input" />
-                                                        <label className="custom-control-label" for="type-suv-input">SUV</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="type-ute-input" />
-                                                        <label className="custom-control-label" for="type-ute-input">Ute</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="type-van-input" />
-                                                        <label className="custom-control-label" for="type-van-input">Van</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="type-wagon-input" />
-                                                        <label className="custom-control-label" for="type-wagon-input">Wagon</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr />
-
-                                    <div className="form-group">
                                         <label className="font-weight-bold">Features</label>
 
                                         <div className="form-row">
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-aircon-input" />
-                                                        <label className="custom-control-label" for="feature-aircon-input">Air Con</label>
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-keyless-entry-input" />
-                                                        <label className="custom-control-label" for="feature-keyless-entry-input">Keyless Entry</label>
+                                            {
+                                                this.state.features.map(feature => 
+                                                    <div className="col-6">
+                                                        <div className="form-group">
+                                                            <div className="custom-control custom-checkbox">
+                                                                <input type="checkbox" className="custom-control-input" id={ "feature-input-" + feature.id } value={ feature.id } />
+                                                                <label className="custom-control-label" for={ "feature-input-" + feature.id }>{ feature.name }</label>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-rearcam-input" />
-                                                        <label className="custom-control-label" for="feature-rearcam-input">Rear Camera</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-gps-input" />
-                                                        <label className="custom-control-label" for="feature-gps-input">GPS </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-radio-input" />
-                                                        <label className="custom-control-label" for="feature-radio-input">AM/FM Radio</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-cdplayer-input" />
-                                                        <label className="custom-control-label" for="feature-cdplayer-input">CD Player</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-bluetooth-input" />
-                                                        <label className="custom-control-label" for="feature-bluetooth-input">Bluetooth Audio System</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input type="checkbox" className="custom-control-input" id="feature-childseat-input" />
-                                                        <label className="custom-control-label" for="feature-childseat-input">Child Seat</label>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                )
+                                            }
                                         </div>
                                     </div>
 
