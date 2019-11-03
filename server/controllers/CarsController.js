@@ -176,7 +176,13 @@ module.exports = {
     getCarsList: async (req, res) => {
 
         // Get all available cars
-        const cars = await CarDAO.getAvailableCars();
+        let cars = await CarDAO.getAvailableCars();
+
+        // Get number of booking from the cars
+        for(let i = 0; i < cars.length; i++) {
+            const rentals = await RentalDAO.getRentalsByCarId(cars[i].id);
+            cars[i].num_booking = rentals.length;
+        }
 
         res.status(200).json({ data: cars });
 
@@ -193,7 +199,12 @@ module.exports = {
         // Get car id
         const carId = req.params.id;
 
-        const car = await CarDAO.getCarById(carId);
+        let car = await CarDAO.getCarById(carId);
+
+        // Get rental informaion of that car
+        const rentals = await RentalDAO.getRentalsByCarId(carId);
+        
+        car.num_booking = rentals.length;
 
         if (Object.keys(car).length > 0) {
             res.status(200).json({ data: car });

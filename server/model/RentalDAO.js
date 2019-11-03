@@ -100,6 +100,21 @@ module.exports = {
     getCurrentRentals: async (userId) => {
         const [r, f] = await DB.execute('SELECT * FROM `rentals` WHERE `user_id` = ? AND `returned_at` IS NULL', [userId]);
         return (r.length > 0) ? r : [];
+    },
+
+    /**
+     * Get rentals by car id.
+     * 
+     * This method retrieve all rental information of the car.
+     * 
+     * @param {int} carId
+     * 
+     * @return List of rentals
+     */
+    getRentalsByCarId: async (carId) => {
+        const [r, f] = await DB.execute('SELECT * FROM `rentals` WHERE `car_id` = ?', [carId]);
+
+        return (r.length > 0) ? r : [];
     }
 
 }

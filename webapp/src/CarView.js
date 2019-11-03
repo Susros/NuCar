@@ -10,10 +10,13 @@
 import React, { Component } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
 
 import AppNavbar from './components/navbar/AppNavbar';
 
 import temporary_car_image from './img/temporary_car_image.jpg';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 function ucwords(str) {
     return (str + '')
@@ -39,7 +42,11 @@ class CarView extends Component {
         this.state = {
             car: null,
             isloading: true,
-            carId: 0
+            carId: 0,
+            booking: {
+                pickup_date: new Date(),
+                return_date: (new Date()).setDate((new Date()).getDate() + 1)
+            }
         }
     }
 
@@ -124,13 +131,10 @@ class CarView extends Component {
                             />
 
                             <div className="my-3 p-3 border-top border-bottom d-flex justify-content-between">
-                                <span><b>20</b> Bookings</span>
+                                <span><b>{ this.state.car.num_booking }</b> Bookings</span>
                                 <span>&bull;</span>
 
-                                <span>5 Seats</span>
-                                <span>&bull;</span>
-
-                                <span>Seden</span>
+                                <span>{ this.state.car.num_seat } Seats</span>
                                 <span>&bull;</span>
 
                                 <span>{ ucwords(this.state.car.transmission) }</span>
@@ -216,29 +220,27 @@ class CarView extends Component {
                                 <div className="form-row">
                                     <div className="col-6">
                                         <div className="form-group">
-                                            <div className="input-group">
-                                                <div className="input-group-prepend">
-                                                    <span className="input-group-text bg-white border-right-0">
-                                                        <i className="fas fa-calendar-alt"></i>
-                                                    </span>
-                                                </div>
-
-                                                <input type="date" name="pickup_date" className="form-control" id="pickup-date-input" placeholder="DD/MM/YYYY" />
-                                            </div>
+                                            <label for="pickup-date-input">Pickup Date</label>
+                                            <DatePicker 
+                                                selected={ this.state.booking.pickup_date } 
+                                                dateFormat="yyyy-MM-dd"
+                                                className="form-control" 
+                                                id="pickup-date-input" 
+                                                name="pickup_date" 
+                                            />
                                         </div>
                                     </div>
 
                                     <div className="col-6">
                                         <div className="form-group">
-                                            <div className="input-group">
-                                                <div className="input-group-prepend">
-                                                    <span className="input-group-text bg-white border-right-0">
-                                                        <i className="fas fa-calendar-alt"></i>
-                                                    </span>
-                                                </div>
-
-                                                <input type="date" name="return_date" className="form-control" id="return-date-input" placeholder="DD/MM/YYYY"/>
-                                            </div>
+                                            <label for="return-date-input">Return Date</label>
+                                            <DatePicker 
+                                                selected={ this.state.booking.return_date } 
+                                                dateFormat="yyyy-MM-dd"
+                                                className="form-control" 
+                                                id="return-date-input" 
+                                                name="return_date" 
+                                            />
                                         </div>
                                     </div>
                                 </div>

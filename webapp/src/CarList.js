@@ -9,10 +9,13 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
 
 import AppNavbar from './components/navbar/AppNavbar';
 
 import temporary_car_image from './img/temporary_car_image.jpg';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 function CarListCard(props) {
     return(
@@ -31,7 +34,7 @@ function CarListCard(props) {
 
                 <div className="row text-center mt-4 border-top border-bottom py-3 bg-light">
                     <div className="col-4">
-                        <span className="lead font-weight-bold">10</span>
+                        <span className="lead font-weight-bold">{ props.num_booking }</span>
                         <div className="text-muted">
                             <i className="fas fa-clipboard-check mr-1"></i> Bookings
                         </div>
@@ -78,7 +81,11 @@ class CarList extends Component {
 
         this.state = {
             cars: null,
-            features: null
+            features: null,
+            filter: {
+                pickup_date: new Date(),
+                return_date: (new Date()).setDate((new Date).getDate() + 1)
+            }
         }
     }
 
@@ -114,6 +121,7 @@ class CarList extends Component {
                 withCredentials: true
             }
         ).then(({ data }) => {
+            console.log(data);
             this.setState({ cars: data.data });
         }).catch(err => {
             this.setState({ cars: null });
@@ -159,7 +167,13 @@ class CarList extends Component {
                                                 </span>
                                             </div>
 
-                                            <input type="date" name="pickup_date" className="form-control border-left-0" id="pickup-date-input" />
+                                            <DatePicker 
+                                                selected={ this.state.filter.pickup_date } 
+                                                dateFormat="yyyy-MM-dd"
+                                                className="form-control border-left-0" 
+                                                id="pickup-date-input" 
+                                                name="pickup_date" 
+                                            />
                                         </div>
                                     </div>
 
@@ -173,7 +187,13 @@ class CarList extends Component {
                                                 </span>
                                             </div>
                                             
-                                            <input type="date" name="return_date" className="form-control border-left-0" id="return-date-input" />
+                                            <DatePicker 
+                                                selected={ this.state.filter.return_date } 
+                                                dateFormat="yyyy-MM-dd"
+                                                className="form-control border-left-0" 
+                                                id="return-date-input" 
+                                                name="return_date" 
+                                            />
                                         </div>
                                     </div>
 
@@ -246,6 +266,8 @@ class CarList extends Component {
                                             transmission={ car.transmission }
                                             img={ temporary_car_image }
                                             id={ car.id }
+                                            key={ car.id }
+                                            num_booking={ car.num_booking }
                                         />
                                     )
                                 
