@@ -19,7 +19,7 @@
     "ethereumjs-abi": "^0.6.8",
     "express": "^4.17.1",
     "helmet": "^3.21.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "moment": "^2.24.0",
     "mysql2": "^1.7.0",
     "password-hash": "^1.2.2",
